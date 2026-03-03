@@ -3,8 +3,8 @@
 // @namespace    barbra/streisand
 // @version      0.0.4
 // @icon         https://vitejs.dev/logo.svg
-// @downloadURL  https://github.com/bingbangbopper/dlscript/raw/main/dist/dlscript.user.js
-// @updateURL    https://github.com/bingbangbopper/dlscript/raw/main/dist/dlscript.user.js
+// @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
+// @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @match        *://*.twitter.com/*
 // @match        *://*.x.com/*
 // @match        *://x.com/*
