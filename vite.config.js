@@ -14,6 +14,7 @@ export default defineConfig({
         match: ['*://*.twitter.com/*', '*://*.x.com/*', '*://x.com/*'],
         downloadURL: 'https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js',
         updateURL: 'https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js',
+        version: '0.0.3',
       },
       build: {
         externalGlobals: {
