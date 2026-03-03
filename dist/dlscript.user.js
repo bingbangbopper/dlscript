@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.4
+// @version      0.0.6
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js

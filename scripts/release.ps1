@@ -1,19 +1,19 @@
-# Stop execution if any command fails
 $ErrorActionPreference = "Stop"
 
-# Bump version
-pnpm version patch
+# 1. Bump version in package.json ONLY (no commit/tag yet)
+pnpm version patch --no-git-tag-version
 
-# Get version from package.json
+# 2. Grab the new version
 $VERSION = node -p "require('./package.json').version"
 
-# Build with new version injected
+# 3. Run your build
 pnpm build
 
-# Push commit + tag
-git push --follow-tags
+# 4. Manually commit, tag, and push
+git add .
+git commit -m "v$VERSION"
+git tag "v$VERSION"
+git push origin main --tags
 
-# Create release with built userscript only
-gh release create "v$VERSION" dist/dlscript.user.js `
-  --title "v$VERSION" `
-  --notes "Release v$VERSION"
+# 5. Create GitHub release
+gh release create "v$VERSION" dist/dlscript.user.js --title "v$VERSION" --notes "Release v$VERSION"
