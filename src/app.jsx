@@ -37,6 +37,7 @@ async function downloadFile(url, filename) {
         if (toastId === null) {
           toastId = toast(`Downloading ${filename}.${extension}...`, {
             progress,
+            pauseOnFocusLoss: false,
             autoClose: false,
             closeOnClick: false,
             draggable: false,
@@ -62,6 +63,7 @@ async function downloadFile(url, filename) {
     toast.done(toastId);
     toast.update(toastId, {
       render: `${filename}.${extension} downloaded successfully`,
+      pauseOnFocusLoss: false,
       type: "success",
       autoClose: 3000,
       hideProgressBar: true,
@@ -72,12 +74,14 @@ async function downloadFile(url, filename) {
       toast.update(toastId, {
         render: "Download failed",
         type: "error",
+        pauseOnFocusLoss: false,
         autoClose: 3000,
         hideProgressBar: true,
         progress: undefined,
       });
     } else {
       toast.error("Download failed", {
+        pauseOnFocusLoss: false,
         autoClose: 3000,
         hideProgressBar: true,
       });
@@ -92,6 +96,12 @@ function handleDownload() {
   const dialogModal = doc.querySelector(
     '[aria-labelledby="modal-header"][role="dialog"]',
   );
+  const carouselModal = doc.querySelector(
+    '[aria-labelledby="modal-header"] [aria-roledescription="carousel"]',
+  );
+  const currentItem =
+    carouselModal?.__reactProps$v555v9s7vi?.children[0].props.children[0].props
+      .currentItem;
 
   if (hoveredVideo) {
     const vidProps = getReactProps(hoveredVideo);
@@ -113,6 +123,21 @@ function handleDownload() {
 
     if (vidUrl) {
       downloadFile(vidUrl, `${authorScreenName} ${tweetId}`);
+    }
+  } else if (carouselModal) {
+    const props = getReactProps(carouselModal);
+    const { currentItem, children } = props.children[0].props.children[0].props;
+    const mediaDetail = children[currentItem].props.mediaDetail;
+    if (!mediaDetail) return;
+
+    const { expanded_url, media_url_https } = mediaDetail;
+    const match = expanded_url?.match(
+      /([^\/]+)\/status\/([^\/]+)\/photo\/([^\/]+)/,
+    );
+
+    if (match) {
+      const [, screenname, snowflake, index] = match;
+      downloadFile(media_url_https, `${screenname} ${snowflake} ${index}`);
     }
   } else if (dialogModal) {
     const mediaDetail = findInReactFiberTree(dialogModal, "mediaDetail");
