@@ -12,9 +12,9 @@ export default defineConfig({
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'barbra/streisand',
         match: ['*://*.twitter.com/*', '*://*.x.com/*', '*://x.com/*'],
-        downloadURL: 'https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js',
-        updateURL: 'https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js',
-        version: '0.0.3',
+        downloadURL: 'https://github.com/bingbangbopper/dlscript/raw/main/dist/dlscript.user.js',
+        updateURL: 'https://github.com/bingbangbopper/dlscript/raw/main/dist/dlscript.user.js',
+        version: '0.0.4',
       },
       build: {
         externalGlobals: {
