@@ -1,6 +1,11 @@
 import { ToastContainer, toast } from "react-toastify";
 import { useHotkeys } from "react-hotkeys-hook";
 import { getReactProps, findInReactFiberTree } from "./helpers";
+import {
+  startDownloadToast,
+  updateDownloadProgress,
+  completeDownload,
+} from "./CustomToast";
 
 async function downloadFile(url, filename) {
   let toastId = null;
@@ -32,20 +37,12 @@ async function downloadFile(url, filename) {
       received += value.length;
 
       if (total) {
-        const progress = received / total;
+        const progress = (received * 100) / total;
 
         if (toastId === null) {
-          toastId = toast(`Downloading ${filename}.${extension}...`, {
-            progress,
-            pauseOnFocusLoss: false,
-            autoClose: false,
-            closeOnClick: false,
-            draggable: false,
-          });
+          toastId = startDownloadToast(`${filename}.${extension}`);
         } else {
-          toast.update(toastId, {
-            progress,
-          });
+          updateDownloadProgress(toastId, `${filename}.${extension}`, progress);
         }
       }
     }
@@ -60,15 +57,7 @@ async function downloadFile(url, filename) {
 
     window.URL.revokeObjectURL(downloadUrl);
 
-    toast.done(toastId);
-    toast.update(toastId, {
-      render: `${filename}.${extension} downloaded successfully`,
-      pauseOnFocusLoss: false,
-      type: "success",
-      autoClose: 3000,
-      hideProgressBar: true,
-      progress: undefined,
-    });
+    completeDownload(toastId, `${filename}.${extension}`);
   } catch (error) {
     if (toastId !== null) {
       toast.update(toastId, {
@@ -114,10 +103,20 @@ function handleDownload() {
       tweetId,
     } = props;
 
-    // Find the highest bitrate video variant
-    const bestVariant = variants
-      ?.filter((v) => v.bitrate)
-      .reduce((max, v) => (v.bitrate > max.bitrate ? v : max));
+    let bestVariant = null;
+
+    if (variants) {
+      for (const v of variants) {
+        try {
+          if (v.bitrate && (!bestVariant || v.bitrate > bestVariant.bitrate)) {
+            bestVariant = v;
+          }
+        } catch (e) {
+          console.error("Access denied on variant:", v);
+          throw e;
+        }
+      }
+    }
 
     const vidUrl = downloadLink || bestVariant?.url;
 

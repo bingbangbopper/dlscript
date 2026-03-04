@@ -16,8 +16,6 @@
 (function (preact) {
   'use strict';
 
-  const d$1=new Set;const importCSS = async e=>{d$1.has(e)||(d$1.add(e),(t=>{typeof GM_addStyle=="function"?GM_addStyle(t):(document.head||document.documentElement).appendChild(document.createElement("style")).append(t);})(e));};
-
   var f$1 = 0;
   function u$1(e2, t2, n, o2, i2, u2) {
     t2 || (t2 = {});
@@ -398,7 +396,7 @@
       H$1(n, e2, t2);
     });
   };
-  var q = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103, G$1 = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image(!S)|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/, J$1 = /^on(Ani|Tra|Tou|BeforeInp|Compo)/, K$2 = /[A-Z0-9]/g, Q$2 = "undefined" != typeof document, X$2 = function(n) {
+  var q = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103, G$1 = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image(!S)|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/, J$1 = /^on(Ani|Tra|Tou|BeforeInp|Compo)/, K$2 = /[A-Z0-9]/g, Q$2 = "undefined" != typeof document, X$3 = function(n) {
     return ("undefined" != typeof Symbol && "symbol" == typeof Symbol() ? /fil|che|rad/ : /fil|che|ra/).test(n);
   };
   function nn(n, t2, e2) {
@@ -436,7 +434,7 @@
         var l2 = t2[i2];
         if (!("value" === i2 && "defaultValue" in t2 && null == l2 || Q$2 && "children" === i2 && "noscript" === e2 || "class" === i2 || "className" === i2)) {
           var c2 = i2.toLowerCase();
-          "defaultValue" === i2 && "value" in t2 && null == t2.value ? i2 = "value" : "download" === i2 && true === l2 ? l2 = "" : "translate" === c2 && "no" === l2 ? l2 = false : "o" === c2[0] && "n" === c2[1] ? "ondoubleclick" === c2 ? i2 = "ondblclick" : "onchange" !== c2 || "input" !== e2 && "textarea" !== e2 || X$2(t2.type) ? "onfocus" === c2 ? i2 = "onfocusin" : "onblur" === c2 ? i2 = "onfocusout" : J$1.test(i2) && (i2 = c2) : c2 = i2 = "oninput" : o2 && G$1.test(i2) ? i2 = i2.replace(K$2, "-$&").toLowerCase() : null === l2 && (l2 = void 0), "oninput" === c2 && u2[i2 = c2] && (i2 = "oninputCapture"), u2[i2] = l2;
+          "defaultValue" === i2 && "value" in t2 && null == t2.value ? i2 = "value" : "download" === i2 && true === l2 ? l2 = "" : "translate" === c2 && "no" === l2 ? l2 = false : "o" === c2[0] && "n" === c2[1] ? "ondoubleclick" === c2 ? i2 = "ondblclick" : "onchange" !== c2 || "input" !== e2 && "textarea" !== e2 || X$3(t2.type) ? "onfocus" === c2 ? i2 = "onfocusin" : "onblur" === c2 ? i2 = "onfocusout" : J$1.test(i2) && (i2 = c2) : c2 = i2 = "oninput" : o2 && G$1.test(i2) ? i2 = i2.replace(K$2, "-$&").toLowerCase() : null === l2 && (l2 = void 0), "oninput" === c2 && u2[i2 = c2] && (i2 = "oninputCapture"), u2[i2] = l2;
         }
       }
       "select" == e2 && u2.multiple && Array.isArray(u2.value) && (u2.value = preact.toChildArray(t2.children).forEach(function(n3) {
@@ -621,7 +619,7 @@
     var e2;
     return (e2 = I$1.get(o2 || 1)) == null ? void 0 : e2.toasts.get(t2);
   };
-  function X$1(t2, o2) {
+  function X$2(t2, o2) {
     var r2;
     if (o2) return !!((r2 = I$1.get(o2)) != null && r2.isToastActive(t2));
     let e2 = false;
@@ -726,7 +724,7 @@
   }
   y.dismiss = qt;
   y.clearWaitingQueue = Ct;
-  y.isActive = X$1;
+  y.isActive = X$2;
   y.update = (t2, o2 = {}) => {
     let e2 = vt(t2, o2);
     if (e2) {
@@ -755,7 +753,7 @@
         c2.has(g2) || c2.set(g2, []), c2.get(g2).push(T2);
       }), Array.from(c2, (T2) => d2(T2[0], T2[1]));
     }
-    return { getToastToRender: l2, isToastActive: X$1, count: s2 == null ? void 0 : s2.length };
+    return { getToastToRender: l2, isToastActive: X$2, count: s2 == null ? void 0 : s2.length };
   }
   function At(t2) {
     let [o2, e2] = d(false), [r2, s2] = d(false), l2 = A$1(null), a2 = A$1({ start: 0, delta: 0, removalDistance: 0, canCloseOnClick: true, canDrag: false, didMove: false }).current, { autoClose: d$1, pauseOnHover: c2, closeToast: T2, onClick: g2, closeOnClick: v2 } = t2;
@@ -963,7 +961,7 @@
   function V(e2, r2, o2) {
     (typeof o2 == "function" && o2(e2, r2) || o2 === true) && e2.preventDefault();
   }
-  function X(e2, r2, o2) {
+  function X$1(e2, r2, o2) {
     return typeof o2 == "function" ? o2(e2, r2) : o2 === true || o2 === void 0;
   }
   const Y = [
@@ -1080,7 +1078,7 @@ toggleScope: () => {
             } else if (re(s2, h2, t2?.ignoreModifiers) || h2.keys?.includes("*")) {
               if (t2?.ignoreEventWhen?.(s2) || B2 && a2.current)
                 return;
-              if (V(s2, h2, t2?.preventDefault), !X(s2, h2, t2?.enabled)) {
+              if (V(s2, h2, t2?.preventDefault), !X$1(s2, h2, t2?.enabled)) {
                 N(s2);
                 return;
               }
@@ -1152,6 +1150,279 @@ toggleScope: () => {
     }
     return null;
   }
+  const mergeClasses = (...classes) => classes.filter((className, index, array) => {
+    return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
+  }).join(" ").trim();
+  const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+  const toCamelCase = (string) => string.replace(
+    /^([A-Z])|[\s-_]+(\w)/g,
+    (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase()
+  );
+  const toPascalCase = (string) => {
+    const camelCase = toCamelCase(string);
+    return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
+  };
+  var defaultAttributes = {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  };
+  const hasA11yProp = (props) => {
+    for (const prop in props) {
+      if (prop.startsWith("aria-") || prop === "role" || prop === "title") {
+        return true;
+      }
+    }
+    return false;
+  };
+  const Icon = D$1(
+    ({
+      color = "currentColor",
+      size = 24,
+      strokeWidth = 2,
+      absoluteStrokeWidth,
+      className = "",
+      children,
+      iconNode,
+      ...rest
+    }, ref) => preact.createElement(
+      "svg",
+      {
+        ref,
+        ...defaultAttributes,
+        width: size,
+        height: size,
+        stroke: color,
+        strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
+        className: mergeClasses("lucide", className),
+        ...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
+        ...rest
+      },
+      [
+        ...iconNode.map(([tag, attrs]) => preact.createElement(tag, attrs)),
+        ...Array.isArray(children) ? children : [children]
+      ]
+    )
+  );
+  const createLucideIcon = (iconName, iconNode) => {
+    const Component2 = D$1(
+      ({ className, ...props }, ref) => preact.createElement(Icon, {
+        ref,
+        iconNode,
+        className: mergeClasses(
+          `lucide-${toKebabCase(toPascalCase(iconName))}`,
+          `lucide-${iconName}`,
+          className
+        ),
+        ...props
+      })
+    );
+    Component2.displayName = toPascalCase(iconName);
+    return Component2;
+  };
+  const __iconNode$2 = [
+    ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+    ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ];
+  const CircleCheck = createLucideIcon("circle-check", __iconNode$2);
+  const __iconNode$1 = [
+    ["path", { d: "M12 15V3", key: "m9g1x1" }],
+    ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }],
+    ["path", { d: "m7 10 5 5 5-5", key: "brsn70" }]
+  ];
+  const Download = createLucideIcon("download", __iconNode$1);
+  const __iconNode = [
+    ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
+    ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
+  ];
+  const X = createLucideIcon("x", __iconNode);
+  const styles = {
+    container: {
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+      gap: "8px"
+    },
+    header: {
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "12px"
+    },
+    iconWrapper: {
+      flexShrink: 0,
+      width: "36px",
+      height: "36px",
+      borderRadius: "50%",
+      background: "rgba(255, 255, 255, 0.10)",
+      display: "grid",
+      placeItems: "center"
+    },
+    iconDownload: {
+      width: "18px",
+      height: "18px",
+      color: "#60a5fa"
+},
+    iconCheck: {
+      width: "18px",
+      height: "18px",
+      color: "#34d399"
+},
+    textGroup: {
+      minWidth: 0,
+      flex: 1,
+      paddingRight: "4px"
+    },
+    filename: {
+      fontSize: "13px",
+      fontWeight: 500,
+      color: "#ffffff",
+      margin: 0,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    },
+    subtitle: {
+      fontSize: "12px",
+      color: "#a1a1aa",
+margin: "4px 0 0 0"
+    },
+    closeButton: {
+      padding: "4px",
+      borderRadius: "4px",
+      color: "#71717a",
+background: "none",
+      border: "none",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "color 0.15s ease",
+      marginTop: "2px"
+    },
+    progressTrack: {
+      width: "100%",
+      height: "3px",
+      background: "rgba(255, 255, 255, 0.10)",
+      borderRadius: "9999px",
+      overflow: "hidden"
+    },
+    progressBar: {
+      height: "100%",
+      background: "linear-gradient(to right, #3b82f6, #22d3ee)",
+borderRadius: "9999px",
+      transition: "width 0.3s ease-out"
+    },
+    dismissButton: {
+      alignSelf: "flex-end",
+      fontSize: "11px",
+      fontWeight: 500,
+      padding: "4px 8px",
+      borderRadius: "6px",
+      background: "rgba(255, 255, 255, 0.05)",
+      color: "#a1a1aa",
+border: "none",
+      cursor: "pointer",
+      transition: "all 0.15s ease",
+      lineHeight: 1,
+      marginTop: "2px"
+    }
+  };
+  function truncateMiddle(name, max = 32) {
+    if (name.length <= max) return name;
+    const ext = name.lastIndexOf(".") !== -1 ? name.slice(name.lastIndexOf(".")) : "";
+    const stem = name.slice(0, name.length - ext.length);
+    const keep = max - ext.length - 3;
+    return stem.slice(0, Math.ceil(keep / 2)) + "…" + stem.slice(-Math.floor(keep / 2)) + ext;
+  }
+  function DownloadDark({
+    closeToast,
+    data
+  }) {
+    const done = data.progress >= 100;
+    return u$1("div", { style: styles.container, children: [
+u$1("div", { style: styles.header, children: [
+u$1("div", { style: styles.iconWrapper, children: done ? u$1(CircleCheck, { style: styles.iconCheck }) : u$1(
+          Download,
+          {
+            style: {
+              ...styles.iconDownload,
+              animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
+            }
+          }
+        ) }),
+u$1("div", { style: styles.textGroup, children: [
+u$1("p", { style: styles.filename, children: truncateMiddle(data.filename) }),
+u$1("p", { style: styles.subtitle, children: done ? "Saved to Downloads" : `${Math.floor(data.progress)}% complete` })
+        ] }),
+        !done && u$1(
+          "button",
+          {
+            onClick: closeToast,
+            style: styles.closeButton,
+            onMouseEnter: (e2) => e2.currentTarget.style.color = "#d4d4d8",
+            onMouseLeave: (e2) => e2.currentTarget.style.color = "#71717a",
+            children: u$1(X, { style: { width: "16px", height: "16px" } })
+          }
+        )
+      ] }),
+      !done && u$1("div", { style: styles.progressTrack, children: u$1(
+        "div",
+        {
+          style: {
+            ...styles.progressBar,
+            width: `${data.progress}%`
+          }
+        }
+      ) }),
+      done && u$1(
+        "button",
+        {
+          onClick: closeToast,
+          style: styles.dismissButton,
+          onMouseEnter: (e2) => {
+            const btn = e2.currentTarget;
+            btn.style.color = "#e4e4e7";
+            btn.style.background = "rgba(255,255,255,0.10)";
+          },
+          onMouseLeave: (e2) => {
+            const btn = e2.currentTarget;
+            btn.style.color = "#a1a1aa";
+            btn.style.background = "rgba(255,255,255,0.05)";
+          },
+          onMouseDown: (e2) => e2.currentTarget.style.transform = "scale(0.97)",
+          onMouseUp: (e2) => e2.currentTarget.style.transform = "scale(1)",
+          children: "Dismiss"
+        }
+      )
+    ] });
+  }
+  function startDownloadToast(filename) {
+    const id = y(DownloadDark, {
+      data: { filename, progress: 0 },
+      style: { background: "#18181b", color: "#ffffff" },
+autoClose: false,
+      closeButton: false,
+      hideProgressBar: true
+    });
+    return id;
+  }
+  function updateDownloadProgress(id, filename, progress) {
+    y.update(id, {
+      data: { filename, progress }
+    });
+  }
+  function completeDownload(id, filename) {
+    y.update(id, {
+      data: { filename, progress: 100 },
+      autoClose: 4e3
+    });
+  }
   async function downloadFile(url, filename) {
     let toastId = null;
     try {
@@ -1173,19 +1444,11 @@ toggleScope: () => {
         chunks.push(value);
         received += value.length;
         if (total) {
-          const progress = received / total;
+          const progress = received * 100 / total;
           if (toastId === null) {
-            toastId = y(`Downloading ${filename}.${extension}...`, {
-              progress,
-              pauseOnFocusLoss: false,
-              autoClose: false,
-              closeOnClick: false,
-              draggable: false
-            });
+            toastId = startDownloadToast(`${filename}.${extension}`);
           } else {
-            y.update(toastId, {
-              progress
-            });
+            updateDownloadProgress(toastId, `${filename}.${extension}`, progress);
           }
         }
       }
@@ -1196,15 +1459,7 @@ toggleScope: () => {
       a2.download = filename + "." + extension;
       a2.click();
       window.URL.revokeObjectURL(downloadUrl);
-      y.done(toastId);
-      y.update(toastId, {
-        render: `${filename}.${extension} downloaded successfully`,
-        pauseOnFocusLoss: false,
-        type: "success",
-        autoClose: 3e3,
-        hideProgressBar: true,
-        progress: void 0
-      });
+      completeDownload(toastId, `${filename}.${extension}`);
     } catch (error) {
       if (toastId !== null) {
         y.update(toastId, {
@@ -1245,7 +1500,19 @@ toggleScope: () => {
         authorScreenName,
         tweetId
       } = props;
-      const bestVariant = variants?.filter((v2) => v2.bitrate).reduce((max, v2) => v2.bitrate > max.bitrate ? v2 : max);
+      let bestVariant = null;
+      if (variants) {
+        for (const v2 of variants) {
+          try {
+            if (v2.bitrate && (!bestVariant || v2.bitrate > bestVariant.bitrate)) {
+              bestVariant = v2;
+            }
+          } catch (e2) {
+            console.error("Access denied on variant:", v2);
+            throw e2;
+          }
+        }
+      }
       const vidUrl = downloadLink || bestVariant?.url;
       if (vidUrl) {
         downloadFile(vidUrl, `${authorScreenName} ${tweetId}`);
@@ -1293,8 +1560,6 @@ toggleScope: () => {
     });
     return u$1(preact.Fragment, { children: u$1(Lt, { position: "top-center" }) });
   }
-  const indexCss = ":root{--toastify-toast-width: 500px}";
-  importCSS(indexCss);
   preact.render(
 u$1(App, {}),
     (() => {
