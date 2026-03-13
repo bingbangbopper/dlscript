@@ -221,6 +221,7 @@ export function startDownloadToast(filename: string): Id {
     autoClose: false,
     closeButton: false,
     hideProgressBar: true,
+    pauseOnFocusLoss: false,
   });
 
   return id;
@@ -241,6 +242,6 @@ export function completeDownload(id: Id, filename: string) {
   // 3️⃣ Mark complete, auto‑dismiss after 4s
   toast.update(id, {
     data: { filename, progress: 100 },
-    autoClose: 4000,
+    autoClose: 2000,
   });
 }

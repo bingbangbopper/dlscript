@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.7
+// @version      0.0.8
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
@@ -1125,31 +1125,6 @@ toggleScope: () => {
     }
     return null;
   }
-  function findInReactFiberTree(element, targetKey) {
-    if (!element || typeof element !== "object") return null;
-    const fiberKey = Object.keys(element).find(
-      (k2) => k2.startsWith("__reactFiber$")
-    );
-    if (!fiberKey) return null;
-    const rootFiber = element[fiberKey];
-    if (!rootFiber) return null;
-    const stack = [rootFiber];
-    while (stack.length > 0) {
-      const fiber = stack.pop();
-      if (!fiber || typeof fiber !== "object") continue;
-      const props = fiber.memoizedProps;
-      if (props && typeof props === "object" && targetKey in props) {
-        return props[targetKey];
-      }
-      if (fiber.child) {
-        stack.push(fiber.child);
-      }
-      if (fiber.sibling) {
-        stack.push(fiber.sibling);
-      }
-    }
-    return null;
-  }
   const mergeClasses = (...classes) => classes.filter((className, index, array) => {
     return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
   }).join(" ").trim();
@@ -1408,7 +1383,8 @@ u$1("p", { style: styles.subtitle, children: done ? "Saved to Downloads" : `${Ma
       style: { background: "#18181b", color: "#ffffff" },
 autoClose: false,
       closeButton: false,
-      hideProgressBar: true
+      hideProgressBar: true,
+      pauseOnFocusLoss: false
     });
     return id;
   }
@@ -1420,7 +1396,7 @@ autoClose: false,
   function completeDownload(id, filename) {
     y.update(id, {
       data: { filename, progress: 100 },
-      autoClose: 4e3
+      autoClose: 2e3
     });
   }
   async function downloadFile(url, filename) {
@@ -1484,13 +1460,6 @@ autoClose: false,
     const hoveredVideo = doc.querySelector(
       "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])"
     );
-    const dialogModal = doc.querySelector(
-      '[aria-labelledby="modal-header"][role="dialog"]'
-    );
-    const carouselModal = doc.querySelector(
-      '[aria-labelledby="modal-header"] [aria-roledescription="carousel"]'
-    );
-    carouselModal?.__reactProps$v555v9s7vi?.children[0].props.children[0].props.currentItem;
     if (hoveredVideo) {
       const vidProps = getReactProps(hoveredVideo);
       const props = vidProps?.children?.props;
@@ -1517,37 +1486,13 @@ autoClose: false,
       if (vidUrl) {
         downloadFile(vidUrl, `${authorScreenName} ${tweetId}`);
       }
-    } else if (carouselModal) {
-      const props = getReactProps(carouselModal);
-      const { currentItem: currentItem2, children } = props.children[0].props.children[0].props;
-      const mediaDetail = children[currentItem2].props.mediaDetail;
-      if (!mediaDetail) return;
-      const { expanded_url, media_url_https } = mediaDetail;
-      const match = expanded_url?.match(
-        /([^\/]+)\/status\/([^\/]+)\/photo\/([^\/]+)/
-      );
-      if (match) {
-        const [, screenname, snowflake, index] = match;
-        downloadFile(media_url_https, `${screenname} ${snowflake} ${index}`);
-      }
-    } else if (dialogModal) {
-      const mediaDetail = findInReactFiberTree(dialogModal, "mediaDetail");
-      if (!mediaDetail) return;
-      const { expanded_url, media_url_https } = mediaDetail;
-      const match = expanded_url?.match(
-        /([^\/]+)\/status\/([^\/]+)\/photo\/([^\/]+)/
-      );
-      if (match) {
-        const [, screenname, snowflake, index] = match;
-        downloadFile(media_url_https, `${screenname} ${snowflake} ${index}`);
-      }
     } else {
       const hoveredImg = doc.querySelector("img:hover");
       const hoveredLink = doc.querySelector("a:hover");
-      if (!hoveredImg || !hoveredLink) return;
+      if (!hoveredImg) return;
       const picUrl = hoveredImg.src;
-      const newUrl = picUrl.replace(/(name=)[^&]*/, "$14096x4096");
-      const href = hoveredLink.href;
+      const newUrl = picUrl.split("?")[0] + (picUrl.includes("format=png") ? "?format=png&name=4096x4096" : "?format=jpg&name=4096x4096");
+      const href = hoveredLink?.href || window.location.href;
       navigator.clipboard.writeText(href);
       const [, , , screenname, , snowflake, , index] = href.split("/");
       downloadFile(newUrl, `${screenname} ${snowflake} ${index}`);

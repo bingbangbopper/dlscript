@@ -82,15 +82,6 @@ function handleDownload() {
   const hoveredVideo = doc.querySelector(
     "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])",
   );
-  const dialogModal = doc.querySelector(
-    '[aria-labelledby="modal-header"][role="dialog"]',
-  );
-  const carouselModal = doc.querySelector(
-    '[aria-labelledby="modal-header"] [aria-roledescription="carousel"]',
-  );
-  const currentItem =
-    carouselModal?.__reactProps$v555v9s7vi?.children[0].props.children[0].props
-      .currentItem;
 
   if (hoveredVideo) {
     const vidProps = getReactProps(hoveredVideo);
@@ -123,44 +114,20 @@ function handleDownload() {
     if (vidUrl) {
       downloadFile(vidUrl, `${authorScreenName} ${tweetId}`);
     }
-  } else if (carouselModal) {
-    const props = getReactProps(carouselModal);
-    const { currentItem, children } = props.children[0].props.children[0].props;
-    const mediaDetail = children[currentItem].props.mediaDetail;
-    if (!mediaDetail) return;
-
-    const { expanded_url, media_url_https } = mediaDetail;
-    const match = expanded_url?.match(
-      /([^\/]+)\/status\/([^\/]+)\/photo\/([^\/]+)/,
-    );
-
-    if (match) {
-      const [, screenname, snowflake, index] = match;
-      downloadFile(media_url_https, `${screenname} ${snowflake} ${index}`);
-    }
-  } else if (dialogModal) {
-    const mediaDetail = findInReactFiberTree(dialogModal, "mediaDetail");
-    if (!mediaDetail) return;
-
-    const { expanded_url, media_url_https } = mediaDetail;
-    const match = expanded_url?.match(
-      /([^\/]+)\/status\/([^\/]+)\/photo\/([^\/]+)/,
-    );
-
-    if (match) {
-      const [, screenname, snowflake, index] = match;
-      downloadFile(media_url_https, `${screenname} ${snowflake} ${index}`);
-    }
   } else {
     const hoveredImg = doc.querySelector("img:hover");
     const hoveredLink = doc.querySelector("a:hover");
 
-    if (!hoveredImg || !hoveredLink) return;
+    if (!hoveredImg) return;
 
     // Get image url and upgrade resolution to 4096x4096
     const picUrl = hoveredImg.src;
-    const newUrl = picUrl.replace(/(name=)[^&]*/, "$14096x4096");
-    const href = hoveredLink.href;
+    const newUrl =
+      picUrl.split("?")[0] +
+      (picUrl.includes("format=png")
+        ? "?format=png&name=4096x4096"
+        : "?format=jpg&name=4096x4096");
+    const href = hoveredLink?.href || window.location.href;
 
     navigator.clipboard.writeText(href);
 
