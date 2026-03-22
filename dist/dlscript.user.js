@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.8
+// @version      0.0.9
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
@@ -1473,7 +1473,7 @@ autoClose: false,
       if (variants) {
         for (const v2 of variants) {
           try {
-            if (v2.bitrate && (!bestVariant || v2.bitrate > bestVariant.bitrate)) {
+            if (!bestVariant || v2.bitrate > bestVariant.bitrate) {
               bestVariant = v2;
             }
           } catch (e2) {

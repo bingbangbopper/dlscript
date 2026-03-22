@@ -77,6 +77,7 @@ async function downloadFile(url, filename) {
     }
   }
 }
+
 function handleDownload() {
   const doc = unsafeWindow.document;
   const hoveredVideo = doc.querySelector(
@@ -99,7 +100,7 @@ function handleDownload() {
     if (variants) {
       for (const v of variants) {
         try {
-          if (v.bitrate && (!bestVariant || v.bitrate > bestVariant.bitrate)) {
+          if (!bestVariant || v.bitrate > bestVariant.bitrate) {
             bestVariant = v;
           }
         } catch (e) {
@@ -131,7 +132,8 @@ function handleDownload() {
 
     navigator.clipboard.writeText(href);
 
-    // Extract details from URL (e.g., https://x.com/screenname/status/snowflake/photo/1)
+    // Extract details from URL
+    // (e.g., https://x.com/screenname/status/snowflake/photo/1)
     const [, , , screenname, , snowflake, , index] = href.split("/");
     downloadFile(newUrl, `${screenname} ${snowflake} ${index}`);
   }
