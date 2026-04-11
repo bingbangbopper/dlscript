@@ -83,45 +83,41 @@ function handleDownload() {
   const hoveredVideo = doc.querySelector(
     "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])",
   );
-
   if (hoveredVideo) {
     const vidProps = getReactProps(hoveredVideo);
     const props = vidProps?.children?.props;
     if (!props) return;
-
     const {
       source: { downloadLink, variants },
       authorScreenName,
       tweetId,
     } = props;
-
-    let bestVariant = null;
-
+    let bestVariant = {
+      bitrate: 1,
+      src: "",
+      url: "",
+      type: "",
+    };
     if (variants) {
-      for (const v of variants) {
+      for (const v2 of variants) {
         try {
-          if (!bestVariant || v.bitrate > bestVariant.bitrate) {
-            bestVariant = v;
+          if (v2.bitrate > bestVariant.bitrate) {
+            bestVariant = v2;
           }
-        } catch (e) {
-          console.error("Access denied on variant:", v);
-          throw e;
+        } catch (e2) {
+          console.error("Access denied on variant:", v2);
+          throw e2;
         }
       }
     }
-
-    const vidUrl = downloadLink || bestVariant?.url;
-
+    const vidUrl = downloadLink || bestVariant?.url || bestVariant?.src;
     if (vidUrl) {
       downloadFile(vidUrl, `${authorScreenName} ${tweetId}`);
     }
   } else {
     const hoveredImg = doc.querySelector("img:hover");
     const hoveredLink = doc.querySelector("a:hover");
-
     if (!hoveredImg) return;
-
-    // Get image url and upgrade resolution to 4096x4096
     const picUrl = hoveredImg.src;
     const newUrl =
       picUrl.split("?")[0] +
@@ -129,11 +125,7 @@ function handleDownload() {
         ? "?format=png&name=4096x4096"
         : "?format=jpg&name=4096x4096");
     const href = hoveredLink?.href || window.location.href;
-
     navigator.clipboard.writeText(href);
-
-    // Extract details from URL
-    // (e.g., https://x.com/screenname/status/snowflake/photo/1)
     const [, , , screenname, , snowflake, , index] = href.split("/");
     downloadFile(newUrl, `${screenname} ${snowflake} ${index}`);
   }

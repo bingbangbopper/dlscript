@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.9
+// @version      0.0.10
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
@@ -1469,11 +1469,16 @@ autoClose: false,
         authorScreenName,
         tweetId
       } = props;
-      let bestVariant = null;
+      let bestVariant = {
+        bitrate: 1,
+        src: "",
+        url: "",
+        type: ""
+      };
       if (variants) {
         for (const v2 of variants) {
           try {
-            if (!bestVariant || v2.bitrate > bestVariant.bitrate) {
+            if (v2.bitrate > bestVariant.bitrate) {
               bestVariant = v2;
             }
           } catch (e2) {
@@ -1482,7 +1487,7 @@ autoClose: false,
           }
         }
       }
-      const vidUrl = downloadLink || bestVariant?.url;
+      const vidUrl = downloadLink || bestVariant?.url || bestVariant?.src;
       if (vidUrl) {
         downloadFile(vidUrl, `${authorScreenName} ${tweetId}`);
       }
