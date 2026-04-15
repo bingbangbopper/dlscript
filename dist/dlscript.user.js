@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.10
+// @version      0.0.11
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
@@ -1470,7 +1470,7 @@ autoClose: false,
         tweetId
       } = props;
       let bestVariant = {
-        bitrate: 1,
+        bitrate: -11037,
         src: "",
         url: "",
         type: ""

@@ -93,7 +93,7 @@ function handleDownload() {
       tweetId,
     } = props;
     let bestVariant = {
-      bitrate: 1,
+      bitrate: -11037,
       src: "",
       url: "",
       type: "",
