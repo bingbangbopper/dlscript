@@ -78,11 +78,38 @@ async function downloadFile(url, filename) {
   }
 }
 
+async function executeWithDelay(tasks, delay) {
+  for (const task of tasks) {
+    await task();
+    // Wait for the specified delay before the next iteration
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+}
+
 function handleDownload() {
   const doc = unsafeWindow.document;
   const hoveredVideo = doc.querySelector(
     "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])",
   );
+  const likebutton = document.querySelector(
+    `article:hover button[data-testid="like"]`,
+  );
+  const retweetbutton = document.querySelector(
+    `article:hover button[data-testid="retweet"]`,
+  );
+
+  executeWithDelay(
+    [
+      () => likebutton.click(),
+      () => retweetbutton.click(),
+      () =>
+        document
+          .querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]")
+          .click(),
+    ],
+    200,
+  );
+
   if (hoveredVideo) {
     const vidProps = getReactProps(hoveredVideo);
     const props = vidProps?.children?.props;
