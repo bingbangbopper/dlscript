@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useHotkeys } from "react-hotkeys-hook";
 import { getReactProps, findInReactFiberTree } from "./helpers";
@@ -86,29 +87,35 @@ async function executeWithDelay(tasks, delay) {
   }
 }
 
-function handleDownload() {
+function handleDownload(autoEngage) {
   const doc = unsafeWindow.document;
   const hoveredVideo = doc.querySelector(
     "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])",
   );
-  const likebutton = document.querySelector(
-    `article:hover button[data-testid="like"]`,
-  );
-  const retweetbutton = document.querySelector(
-    `article:hover button[data-testid="retweet"]`,
-  );
+  
+  // Only execute the like/retweet behavior if autoEngage is true
+  if (autoEngage) {
+    const likebutton = document.querySelector(
+      `article:hover button[data-testid="like"]`,
+    );
+    const retweetbutton = document.querySelector(
+      `article:hover button[data-testid="retweet"]`,
+    );
 
-  executeWithDelay(
-    [
-      () => likebutton.click(),
-      () => retweetbutton.click(),
-      () =>
-        document
-          .querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]")
-          .click(),
-    ],
-    200,
-  );
+    if (likebutton && retweetbutton) {
+      executeWithDelay(
+        [
+          () => likebutton.click(),
+          () => retweetbutton.click(),
+          () =>
+            document
+              .querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]")
+              ?.click(),
+        ],
+        200,
+      );
+    }
+  }
 
   if (hoveredVideo) {
     const vidProps = getReactProps(hoveredVideo);
@@ -159,13 +166,55 @@ function handleDownload() {
 }
 
 export function App() {
+  // Load initial state from local storage, default to true if it doesn't exist yet
+  const [autoEngage, setAutoEngage] = useState(() => {
+    const saved = localStorage.getItem("twit_auto_engage");
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  // Save to local storage whenever the state changes
+  useEffect(() => {
+    localStorage.setItem("twit_auto_engage", JSON.stringify(autoEngage));
+  }, [autoEngage]);
+
   useHotkeys("shift+d", (event) => {
     event.preventDefault();
-    handleDownload();
+    handleDownload(autoEngage);
   });
+
   return (
     <>
       <ToastContainer position="top-center" />
+      {/* Corner Switch UI */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          left: "20px",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          color: "#fff",
+          padding: "10px 14px",
+          borderRadius: "8px",
+          zIndex: 9999,
+          fontFamily: "sans-serif",
+          fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        <input
+          type="checkbox"
+          id="autoEngageSwitch"
+          checked={autoEngage}
+          onChange={(e) => setAutoEngage(e.target.checked)}
+          style={{ cursor: "pointer" }}
+        />
+        <label htmlFor="autoEngageSwitch" style={{ cursor: "pointer", userSelect: "none" }}>
+          Auto Like & RT
+        </label>
+      </div>
     </>
   );
 }

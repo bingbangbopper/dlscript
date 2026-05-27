@@ -1461,25 +1461,29 @@ autoClose: false,
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  function handleDownload() {
+  function handleDownload(autoEngage) {
     const doc = unsafeWindow.document;
     const hoveredVideo = doc.querySelector(
       "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])"
     );
-    const likebutton = document.querySelector(
-      `article:hover button[data-testid="like"]`
-    );
-    const retweetbutton = document.querySelector(
-      `article:hover button[data-testid="retweet"]`
-    );
-    executeWithDelay(
-      [
-        () => likebutton.click(),
-        () => retweetbutton.click(),
-        () => document.querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]").click()
-      ],
-      200
-    );
+    if (autoEngage) {
+      const likebutton = document.querySelector(
+        `article:hover button[data-testid="like"]`
+      );
+      const retweetbutton = document.querySelector(
+        `article:hover button[data-testid="retweet"]`
+      );
+      if (likebutton && retweetbutton) {
+        executeWithDelay(
+          [
+            () => likebutton.click(),
+            () => retweetbutton.click(),
+            () => document.querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]")?.click()
+          ],
+          200
+        );
+      }
+    }
     if (hoveredVideo) {
       const vidProps = getReactProps(hoveredVideo);
       const props = vidProps?.children?.props;
@@ -1524,11 +1528,54 @@ autoClose: false,
     }
   }
   function App() {
+    const [autoEngage, setAutoEngage] = d(() => {
+      const saved = localStorage.getItem("twit_auto_engage");
+      return saved !== null ? JSON.parse(saved) : true;
+    });
+    y$1(() => {
+      localStorage.setItem("twit_auto_engage", JSON.stringify(autoEngage));
+    }, [autoEngage]);
     fe("shift+d", (event) => {
       event.preventDefault();
-      handleDownload();
+      handleDownload(autoEngage);
     });
-    return u$1(preact.Fragment, { children: u$1(Lt, { position: "top-center" }) });
+    return u$1(preact.Fragment, { children: [
+u$1(Lt, { position: "top-center" }),
+u$1(
+        "div",
+        {
+          style: {
+            position: "fixed",
+            bottom: "20px",
+            left: "20px",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            color: "#fff",
+            padding: "10px 14px",
+            borderRadius: "8px",
+            zIndex: 9999,
+            fontFamily: "sans-serif",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            backdropFilter: "blur(4px)"
+          },
+          children: [
+u$1(
+              "input",
+              {
+                type: "checkbox",
+                id: "autoEngageSwitch",
+                checked: autoEngage,
+                onChange: (e2) => setAutoEngage(e2.target.checked),
+                style: { cursor: "pointer" }
+              }
+            ),
+u$1("label", { htmlFor: "autoEngageSwitch", style: { cursor: "pointer", userSelect: "none" }, children: "Auto Like & RT" })
+          ]
+        }
+      )
+    ] });
   }
   preact.render(
 u$1(App, {}),
