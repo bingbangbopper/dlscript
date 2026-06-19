@@ -82,7 +82,7 @@ async function downloadFile(url, filename) {
         });
       });
     }
-    const result = await upload(blob);
+    const result = await upload(blob, `${filename}.${extension}`);
     console.log(result);
 
     completeDownload(toastId, `${filename}.${extension}`);
@@ -96,12 +96,14 @@ async function downloadFile(url, filename) {
         hideProgressBar: true,
         progress: undefined,
       });
+      console.log(error);
     } else {
       toast.error("Download failed", {
         pauseOnFocusLoss: false,
         autoClose: 3000,
         hideProgressBar: true,
       });
+      console.log(error);
     }
   }
 }

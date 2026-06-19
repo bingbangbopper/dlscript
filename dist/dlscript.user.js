@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.15
+// @version      0.0.16
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
@@ -1456,7 +1456,7 @@ data: form,
       a2.download = filename + "." + extension;
       a2.click();
       window.URL.revokeObjectURL(downloadUrl);
-      const result = await upload(blob);
+      const result = await upload(blob, `${filename}.${extension}`);
       console.log(result);
       completeDownload(toastId, `${filename}.${extension}`);
     } catch (error) {
@@ -1469,12 +1469,14 @@ data: form,
           hideProgressBar: true,
           progress: void 0
         });
+        console.log(error);
       } else {
         y.error("Download failed", {
           pauseOnFocusLoss: false,
           autoClose: 3e3,
           hideProgressBar: true
         });
+        console.log(error);
       }
     }
   }
