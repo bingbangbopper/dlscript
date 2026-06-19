@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 # 1. Bump version in package.json ONLY (no commit/tag yet)
-pnpm version patch --no-git-tag-version
+pnpm version patch --no-git-tag-version --no-git-checks
 
 # 2. Grab the new version
 $VERSION = node -p "require('./package.json').version"

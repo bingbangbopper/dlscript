@@ -18,6 +18,8 @@ export default defineConfig({
         updateURL:
           "https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js",
         version: pkg.version,
+        grant: ["GM.xmlHttpRequest"],
+        connect: ["image-upload-worker.11037.workers.dev"],
       },
       build: {
         externalGlobals: {

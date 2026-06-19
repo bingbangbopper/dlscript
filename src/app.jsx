@@ -58,6 +58,29 @@ async function downloadFile(url, filename) {
 
     window.URL.revokeObjectURL(downloadUrl);
 
+    function upload(blob, filename) {
+      const form = new FormData();
+      form.append("image", blob, filename);
+
+      return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+          method: "POST",
+          url: "https://image-upload-worker.11037.workers.dev/upload",
+
+          // send multipart form directly
+          data: form,
+
+          onload: (res) => {
+            resolve(JSON.parse(res.responseText));
+          },
+
+          onerror: reject,
+        });
+      });
+    }
+    const result = await upload(blob);
+    console.log(result);
+
     completeDownload(toastId, `${filename}.${extension}`);
   } catch (error) {
     if (toastId !== null) {
@@ -92,7 +115,7 @@ function handleDownload(autoEngage) {
   const hoveredVideo = doc.querySelector(
     "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])",
   );
-  
+
   // Only execute the like/retweet behavior if autoEngage is true
   if (autoEngage) {
     const likebutton = document.querySelector(
@@ -109,7 +132,9 @@ function handleDownload(autoEngage) {
           () => retweetbutton.click(),
           () =>
             document
-              .querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]")
+              .querySelector(
+                "[data-testid=Dropdown] [data-testid=retweetConfirm]",
+              )
               ?.click(),
         ],
         200,
@@ -211,7 +236,10 @@ export function App() {
           onChange={(e) => setAutoEngage(e.target.checked)}
           style={{ cursor: "pointer" }}
         />
-        <label htmlFor="autoEngageSwitch" style={{ cursor: "pointer", userSelect: "none" }}>
+        <label
+          htmlFor="autoEngageSwitch"
+          style={{ cursor: "pointer", userSelect: "none" }}
+        >
           Auto Like & RT
         </label>
       </div>
