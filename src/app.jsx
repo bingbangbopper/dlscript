@@ -106,7 +106,7 @@ async function downloadFile(url, filename, snowflake = null) {
     /** @type {DownloadMetadata} */
     const metadata = {
       filename: fullName,
-      source_url: url,
+      source_url: `https://x.com/${filename.split(" ")[0]}/status/${snowflake}`,
       published_date: snowflake ? snowflakeToTimestamp(snowflake) : 0,
       retrieved_date: Date.now(),
     };
