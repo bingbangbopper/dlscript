@@ -11,9 +11,24 @@ import {
 const UPLOAD_URL = "https://image-upload-worker.11037.workers.dev/upload";
 const UPLOAD_TOKEN = "Bearer 4IGUDUJO4WSQQQJFXUUZHJJFAXJ4FZLA";
 
-function upload(blob, filename) {
+const TWITTER_EPOCH = 1288834974657n;
+
+/**
+ * @typedef {Object} DownloadMetadata
+ * @property {string} filename
+ * @property {string} source_url
+ * @property {number} published_date
+ * @property {number} retrieved_date
+ */
+
+function snowflakeToTimestamp(snowflake) {
+  return Number((BigInt(snowflake) >> 22n) + TWITTER_EPOCH);
+}
+
+function upload(blob, filename, customMetadata) {
   const form = new FormData();
   form.append("image", blob, filename);
+  form.append("customMetadata", JSON.stringify(customMetadata));
   return new Promise((resolve, reject) => {
     GM_xmlhttpRequest({
       method: "POST",
@@ -45,7 +60,7 @@ function toastError(toastId, message = "Download failed") {
   }
 }
 
-async function downloadFile(url, filename) {
+async function downloadFile(url, filename, snowflake = null) {
   let toastId = null;
 
   try {
@@ -88,7 +103,14 @@ async function downloadFile(url, filename) {
     a.click();
     window.URL.revokeObjectURL(a.href);
 
-    const result = await upload(blob, fullName);
+    /** @type {DownloadMetadata} */
+    const metadata = {
+      filename: fullName,
+      source_url: url,
+      published_date: snowflake ? snowflakeToTimestamp(snowflake) : 0,
+      retrieved_date: Date.now(),
+    };
+    const result = await upload(blob, fullName, metadata);
     console.log(result);
 
     completeDownload(toastId, fullName);
@@ -151,7 +173,7 @@ function downloadHoveredVideo(doc) {
   const best = variants ? getBestVariant(variants) : {};
   const url = downloadLink || best.url || best.src;
 
-  if (url) downloadFile(url, `${authorScreenName} ${tweetId}`);
+  if (url) downloadFile(url, `${authorScreenName} ${tweetId}`, tweetId);
   return true;
 }
 
@@ -169,7 +191,7 @@ function downloadHoveredImage(doc) {
   navigator.clipboard.writeText(href);
 
   const [, , , screenname, , snowflake, , index] = href.split("/");
-  downloadFile(base + query, `${screenname} ${snowflake} ${index}`);
+  downloadFile(base + query, `${screenname} ${snowflake} ${index}`, snowflake);
 }
 
 function handleDownload(autoEngage) {
