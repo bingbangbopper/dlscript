@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.16
+// @version      0.0.17
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
@@ -1402,36 +1402,52 @@ autoClose: false,
       autoClose: 2e3
     });
   }
+  const UPLOAD_URL = "https://image-upload-worker.11037.workers.dev/upload";
+  const UPLOAD_TOKEN = "Bearer 4IGUDUJO4WSQQQJFXUUZHJJFAXJ4FZLA";
+  function upload(blob, filename) {
+    const form = new FormData();
+    form.append("image", blob, filename);
+    return new Promise((resolve, reject) => {
+      GM_xmlhttpRequest({
+        method: "POST",
+        url: UPLOAD_URL,
+        headers: { Authorization: UPLOAD_TOKEN },
+        data: form,
+        onload: (res) => resolve(JSON.parse(res.responseText)),
+        onerror: reject
+      });
+    });
+  }
+  function toastError(toastId, message = "Download failed") {
+    if (toastId !== null) {
+      y.update(toastId, {
+        render: message,
+        type: "error",
+        pauseOnFocusLoss: false,
+        autoClose: 3e3,
+        hideProgressBar: true,
+        progress: void 0
+      });
+    } else {
+      y.error(message, {
+        pauseOnFocusLoss: false,
+        autoClose: 3e3,
+        hideProgressBar: true
+      });
+    }
+  }
   async function downloadFile(url, filename) {
     let toastId = null;
     try {
-      let upload = function(blob2, filename2) {
-        const form = new FormData();
-        form.append("image", blob2, filename2);
-        return new Promise((resolve, reject) => {
-          GM_xmlhttpRequest({
-            method: "POST",
-            url: "https://image-upload-worker.11037.workers.dev/upload",
-            headers: {
-              Authorization: "Bearer 4IGUDUJO4WSQQQJFXUUZHJJFAXJ4FZLA"
-            },
-data: form,
-            onload: (res) => {
-              resolve(JSON.parse(res.responseText));
-            },
-            onerror: reject
-          });
-        });
-      };
       const response = await fetch(url);
       if (!response.ok) {
         y.error("Download failed");
         return;
       }
-      const contentLength = response.headers.get("Content-Length");
       const mimeType = response.headers.get("Content-Type");
       const extension = mimeType.split("/")[1].replace("jpeg", "jpg");
-      const total = contentLength ? parseInt(contentLength, 10) : null;
+      const total = parseInt(response.headers.get("Content-Length"), 10) || null;
+      const fullName = `${filename}.${extension}`;
       const reader = response.body.getReader();
       let received = 0;
       const chunks = [];
@@ -1443,41 +1459,24 @@ data: form,
         if (total) {
           const progress = received * 100 / total;
           if (toastId === null) {
-            toastId = startDownloadToast(`${filename}.${extension}`);
+            toastId = startDownloadToast(fullName);
           } else {
-            updateDownloadProgress(toastId, `${filename}.${extension}`, progress);
+            updateDownloadProgress(toastId, fullName, progress);
           }
         }
       }
       const blob = new Blob(chunks, { type: mimeType });
-      const downloadUrl = window.URL.createObjectURL(blob);
       const a2 = document.createElement("a");
-      a2.href = downloadUrl;
-      a2.download = filename + "." + extension;
+      a2.href = window.URL.createObjectURL(blob);
+      a2.download = fullName;
       a2.click();
-      window.URL.revokeObjectURL(downloadUrl);
-      const result = await upload(blob, `${filename}.${extension}`);
+      window.URL.revokeObjectURL(a2.href);
+      const result = await upload(blob, fullName);
       console.log(result);
-      completeDownload(toastId, `${filename}.${extension}`);
+      completeDownload(toastId, fullName);
     } catch (error) {
-      if (toastId !== null) {
-        y.update(toastId, {
-          render: "Download failed",
-          type: "error",
-          pauseOnFocusLoss: false,
-          autoClose: 3e3,
-          hideProgressBar: true,
-          progress: void 0
-        });
-        console.log(error);
-      } else {
-        y.error("Download failed", {
-          pauseOnFocusLoss: false,
-          autoClose: 3e3,
-          hideProgressBar: true
-        });
-        console.log(error);
-      }
+      console.error(error);
+      toastError(toastId);
     }
   }
   async function executeWithDelay(tasks, delay) {
@@ -1486,73 +1485,62 @@ data: form,
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  function handleDownload(autoEngage) {
-    const doc = unsafeWindow.document;
+  function triggerAutoEngage() {
+    const likeButton = document.querySelector(
+      `article:hover button[data-testid="like"]`
+    );
+    const retweetButton = document.querySelector(
+      `article:hover button[data-testid="retweet"]`
+    );
+    if (!likeButton || !retweetButton) return;
+    executeWithDelay(
+      [
+        () => likeButton.click(),
+        () => retweetButton.click(),
+        () => document.querySelector("[data-testid=Dropdown] [data-testid=retweetConfirm]")?.click()
+      ],
+      200
+    );
+  }
+  function getBestVariant(variants) {
+    let best = { bitrate: -Infinity, src: "", url: "" };
+    for (const v2 of variants) {
+      if (v2.bitrate > best.bitrate) best = v2;
+    }
+    return best;
+  }
+  function downloadHoveredVideo(doc) {
     const hoveredVideo = doc.querySelector(
       "[data-testid=tweetPhoto]:hover:has([data-testid=videoPlayer])"
     );
-    if (autoEngage) {
-      const likebutton = document.querySelector(
-        `article:hover button[data-testid="like"]`
-      );
-      const retweetbutton = document.querySelector(
-        `article:hover button[data-testid="retweet"]`
-      );
-      if (likebutton && retweetbutton) {
-        executeWithDelay(
-          [
-            () => likebutton.click(),
-            () => retweetbutton.click(),
-            () => document.querySelector(
-              "[data-testid=Dropdown] [data-testid=retweetConfirm]"
-            )?.click()
-          ],
-          200
-        );
-      }
-    }
-    if (hoveredVideo) {
-      const vidProps = getReactProps(hoveredVideo);
-      const props = vidProps?.children?.props;
-      if (!props) return;
-      const {
-        source: { downloadLink, variants },
-        authorScreenName,
-        tweetId
-      } = props;
-      let bestVariant = {
-        bitrate: -11037,
-        src: "",
-        url: "",
-        type: ""
-      };
-      if (variants) {
-        for (const v2 of variants) {
-          try {
-            if (v2.bitrate > bestVariant.bitrate) {
-              bestVariant = v2;
-            }
-          } catch (e2) {
-            console.error("Access denied on variant:", v2);
-            throw e2;
-          }
-        }
-      }
-      const vidUrl = downloadLink || bestVariant?.url || bestVariant?.src;
-      if (vidUrl) {
-        downloadFile(vidUrl, `${authorScreenName} ${tweetId}`);
-      }
-    } else {
-      const hoveredImg = doc.querySelector("img:hover");
-      const hoveredLink = doc.querySelector("a:hover");
-      if (!hoveredImg) return;
-      const picUrl = hoveredImg.src;
-      const newUrl = picUrl.split("?")[0] + (picUrl.includes("format=png") ? "?format=png&name=4096x4096" : "?format=jpg&name=4096x4096");
-      const href = hoveredLink?.href || window.location.href;
-      navigator.clipboard.writeText(href);
-      const [, , , screenname, , snowflake, , index] = href.split("/");
-      downloadFile(newUrl, `${screenname} ${snowflake} ${index}`);
-    }
+    if (!hoveredVideo) return false;
+    const props = getReactProps(hoveredVideo)?.children?.props;
+    if (!props) return true;
+    const {
+      source: { downloadLink, variants },
+      authorScreenName,
+      tweetId
+    } = props;
+    const best = variants ? getBestVariant(variants) : {};
+    const url = downloadLink || best.url || best.src;
+    if (url) downloadFile(url, `${authorScreenName} ${tweetId}`);
+    return true;
+  }
+  function downloadHoveredImage(doc) {
+    const hoveredImg = doc.querySelector("img:hover");
+    if (!hoveredImg) return;
+    const picUrl = hoveredImg.src;
+    const base = picUrl.split("?")[0];
+    const query = picUrl.includes("format=png") ? "?format=png&name=4096x4096" : "?format=jpg&name=4096x4096";
+    const href = doc.querySelector("a:hover")?.href || window.location.href;
+    navigator.clipboard.writeText(href);
+    const [, , , screenname, , snowflake, , index] = href.split("/");
+    downloadFile(base + query, `${screenname} ${snowflake} ${index}`);
+  }
+  function handleDownload(autoEngage) {
+    const doc = unsafeWindow.document;
+    if (autoEngage) triggerAutoEngage();
+    if (!downloadHoveredVideo(doc)) downloadHoveredImage(doc);
   }
   function App() {
     const [autoEngage, setAutoEngage] = d(() => {
