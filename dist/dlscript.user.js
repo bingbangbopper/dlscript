@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         dlscript
 // @namespace    barbra/streisand
-// @version      0.0.14
+// @version      0.0.15
 // @icon         https://vitejs.dev/logo.svg
 // @downloadURL  https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
 // @updateURL    https://github.com/bingbangbopper/dlscript/releases/latest/download/dlscript.user.js
@@ -1413,7 +1413,7 @@ autoClose: false,
             method: "POST",
             url: "https://image-upload-worker.11037.workers.dev/upload",
             headers: {
-              Authorization: "Bearer YOUR_UPLOAD_SECRET"
+              Authorization: "Bearer 4IGUDUJO4WSQQQJFXUUZHJJFAXJ4FZLA"
             },
 data: form,
             onload: (res) => {

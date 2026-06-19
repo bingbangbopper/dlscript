@@ -68,7 +68,7 @@ async function downloadFile(url, filename) {
           url: "https://image-upload-worker.11037.workers.dev/upload",
 
           headers: {
-            Authorization: "Bearer YOUR_UPLOAD_SECRET",
+            Authorization: "Bearer 4IGUDUJO4WSQQQJFXUUZHJJFAXJ4FZLA",
           },
 
           // send multipart form directly
